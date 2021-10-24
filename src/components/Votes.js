@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -6,13 +7,23 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Paper from '@mui/material/Paper'
 
+import Button from '@mui/material/Button'
+
+import ModalDetail from './ModalDetail'
+
 const Votes = () => {
-  const createData = (topic, status, result, action) => ({ topic, status, result, action })
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [modalContent, setModalContent] = useState('')
+  const handleActionOnClick = () => setIsModalOpen(true)
+  const handleDetailOnClick = () => setIsModalOpen(true)
+  const handleModalClose = () => setIsModalOpen(false)
+
+  const createData = (topic, status, result) => ({ topic, status, result })
 
   const rows = [
-    createData('下週五換誰分享？', 1, 6.0, 24, 4.0),
-    createData('今年員工旅遊投票', 2, 9.0, 37, 4.3),
-    createData('中午要吃什麼？', 3, 16.0, 24, 6.0),
+    createData('下週五換誰分享？', '可投票', ''),
+    createData('今年員工旅遊投票', '已結束', '新屋'),
+    createData('中午要吃什麼？', '已結束', '麥當勞'),
   ]
 
   return (
@@ -28,16 +39,24 @@ const Votes = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map(({ topic, status, result, action }) => (
+          {rows.map(({ topic, status, result }, index) => (
             <TableRow key={topic} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-              <TableCell>{status}</TableCell>
+              <TableCell>{rows.length - index}</TableCell>
               <TableCell component="th" scope="row">
                 {topic}
               </TableCell>
 
               <TableCell>{status}</TableCell>
               <TableCell>{result}</TableCell>
-              <TableCell>{action}</TableCell>
+              <TableCell>
+                <Button onClick={handleActionOnClick}>Action</Button>
+                <Button onClick={handleDetailOnClick}>Detail</Button>
+                <ModalDetail
+                  isModalOpen={isModalOpen}
+                  handleModalClose={handleModalClose}
+                  modalContent={modalContent}
+                />
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
