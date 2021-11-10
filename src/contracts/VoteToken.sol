@@ -1,4 +1,4 @@
-pragma solidity ^0.8.9;
+pragma solidity 0.8.4;
 
 contract VoteToken {
     string public name = "Vote Token";
