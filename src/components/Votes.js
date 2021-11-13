@@ -6,145 +6,163 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Paper from '@mui/material/Paper'
-
 import Button from '@mui/material/Button'
+import Box from '@mui/material/Box'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
 
 import ModalDetail from './ModalDetail'
 
-import Web3 from 'web3'
-import VoteDApp from '../abis/VoteDApp.json'
-
-const Votes = () => {
+const Votes = ({ account, voteDApp }) => {
+  const [isLoading, setIsLoading] = useState(false)
+  const [votes, setVotes] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalContent, setModalContent] = useState('')
-  const [isLoadWeb3, setIsLoadWeb3] = useState(false)
-  const handleActionOnClick = () => setIsModalOpen(true)
-  const handleDetailOnClick = () => setIsModalOpen(true)
+  const [voteTopic, setVoteTopic] = useState('')
+  const [voteProposal, setVoteProposal] = useState('')
+
+  const handleAddressesOnClick = (addresses) => () => {
+    setModalContent(addresses?.map((item, index) => <Box key={index}>{item}</Box>))
+    setIsModalOpen(true)
+  }
   const handleModalClose = () => setIsModalOpen(false)
 
-  const createData = (topic, status, result) => ({ topic, status, result })
+  const handleCreateVoteOnClick = () => {
+    setIsLoading(true)
+    voteDApp.methods
+      .createVote(voteTopic)
+      .send({ from: account })
+      .on('transactionHash', (hash) => {
+        console.log('aaaaaa', 'transactionHash', hash)
+        setVoteTopic('')
+        setIsLoading(false)
+      })
+      .on('receipt', (receipt) => {
+        // get confirmation - should re-render
+        console.log('aaaaaa', 'receipt', receipt)
+        fetchVotes()
+      })
+  }
 
-  const rows = [
-    createData('下週五換誰分享？', '可投票', ''),
-    createData('今年員工旅遊投票', '已結束', '新屋'),
-    createData('中午要吃什麼？', '已結束', '麥當勞'),
-  ]
+  const handleCreateProposalOnClick = (voteID) => () => {
+    setIsLoading(true)
+    voteDApp.methods
+      .addProposalToVote(voteID, voteProposal)
+      .send({ from: account })
+      .on('transactionHash', (hash) => {
+        console.log('aaaaaa', 'transactionHash', hash)
+        setVoteProposal('')
+        setIsLoading(false)
+      })
+      .on('receipt', (receipt) => {
+        // get confirmation - should re-render
+        console.log('aaaaaa', 'receipt', receipt)
+        fetchVotes()
+      })
+  }
 
-  const [account, setAccount] = useState()
-  const [votes, setVotes] = useState([])
+  async function fetchVotes() {
+    let voteList = []
+    const voteID = await voteDApp.methods.voteID().call()
+
+    for (let i = 1; i <= voteID; i++) {
+      const {
+        0: topic,
+        1: isFinished,
+        2: result,
+        3: starterAddress,
+        4: numProposals,
+      } = await voteDApp.methods.getVote(i).call()
+
+      let proposals = []
+      for (let j = 1; j <= Number(numProposals); j++) {
+        const { 0: proposal, 1: addresses } = await voteDApp.methods.getVoteProposal(i, j).call()
+        console.log('aaaaaa', 'proposal', proposal)
+        proposals.push({ proposal: proposal, addresses: addresses })
+      }
+
+      voteList.unshift({
+        id: i,
+        topic: topic,
+        isFinished: isFinished,
+        result: result,
+        starterAddress: starterAddress,
+        numProposals: Number(numProposals),
+        proposals: proposals,
+      })
+    }
+
+    setVotes(voteList)
+  }
 
   useEffect(() => {
-    async function loadWeb3() {
-      console.log('loadWeb3')
-      if (window.ethereum) {
-        console.log('first')
-        window.web3 = new Web3(window.ethereum)
-        await window.ethereum.enable()
-      } else if (window.web3) {
-        console.log('second')
-        window.web3 = new Web3(window.web3.currentProvider)
-      } else {
-        console.log('last')
-        window.alert('change browser, please')
-      }
-    }
-
-    async function fetchData() {
-      const web3 = window.web3
-      const accounts = await web3.eth.getAccounts()
-
-      // setAccount(accounts[0])
-      console.log('aaaaa', 'account', accounts)
-      const networkId = 4
-
-      // load dapp json
-      const voteDAppData = VoteDApp.networks[networkId]
-      if (!voteDAppData) return
-      const voteDApp = new web3.eth.Contract(VoteDApp.abi, voteDAppData.address)
-      const vote = await voteDApp.methods.getVote(1).call()
-      console.log('aaaaaa', 'vote', vote)
-
-      // load votes table
-      let voteList = []
-      const voteID = await voteDApp.methods.voteID().call()
-      console.log('aaaaaa', 'voteID', voteID) // 2
-
-      for (let i = 1; i <= voteID; i++) {
-        const vote = await voteDApp.methods.getVote(i).call()
-        voteList.push({
-          topic: vote[0],
-          isFinished: vote[1],
-          result: vote[2],
-          starterAddress: vote[3],
-          numProposals: vote[5],
-        })
-      }
-      console.log('aaaa', 'voteList', voteList)
-      setVotes(voteList)
-    }
-
-    loadWeb3()
-    fetchData()
-    setIsLoadWeb3(true)
-  }, [])
+    if (voteDApp) fetchVotes()
+  }, [voteDApp])
 
   return (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell>#</TableCell>
-            <TableCell>Topic</TableCell>
-            <TableCell>Status</TableCell>
-            <TableCell>Result</TableCell>
-            <TableCell>Action</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {votes.map(({ topic, status, result }, index) => (
-            <TableRow key={topic} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-              <TableCell>{rows.length - index}</TableCell>
-              <TableCell component="th" scope="row">
-                {topic}
-              </TableCell>
+    <>
+      <Box sx={{ marginTop: '12px' }}>
+        <TextField
+          label="Create Vote"
+          variant="standard"
+          onChange={(event) => setVoteTopic(event.target.value)}
+        />
+        <Button onClick={handleCreateVoteOnClick}>Create Vote</Button>
+        {isLoading && <Box sx={{ float: 'right' }}>isLoading...</Box>}
+      </Box>
 
-              <TableCell>{status}</TableCell>
-              <TableCell>{result}</TableCell>
-              <TableCell>
-                <Button onClick={handleActionOnClick}>Action</Button>
-                <Button onClick={handleDetailOnClick}>Detail</Button>
-                <ModalDetail
-                  isModalOpen={isModalOpen}
-                  handleModalClose={handleModalClose}
-                  modalContent={modalContent}
-                />
-              </TableCell>
+      <TableContainer component={Paper}>
+        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell>#</TableCell>
+              <TableCell>Topic</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell>Result</TableCell>
+              <TableCell>Action</TableCell>
             </TableRow>
-          ))}
+          </TableHead>
+          <TableBody>
+            {votes.map(({ id, topic, status, result, proposals }, index) => (
+              <TableRow key={topic} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                <TableCell>{votes.length - index}</TableCell>
+                <TableCell component="th" scope="row">
+                  {topic}
+                </TableCell>
 
-          {rows.map(({ topic, isFinished, result }, index) => (
-            <TableRow key={topic} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-              <TableCell>{rows.length - index}</TableCell>
-              <TableCell component="th" scope="row">
-                {topic}
-              </TableCell>
+                <TableCell>{status}</TableCell>
+                <TableCell>{result}</TableCell>
+                <TableCell>
+                  <TextField
+                    label="Proposal"
+                    variant="standard"
+                    onChange={(event) => setVoteProposal(event.target.value)}
+                  />
+                  <Button onClick={handleCreateProposalOnClick(id)}>
+                    Create Proposal {voteProposal}
+                  </Button>
+                  {proposals?.map(({ proposal, addresses }) => (
+                    <Box key={proposal}>
+                      * {proposal} <Button>Vote</Button> 目前
+                      {addresses.length}票
+                      {addresses.length > 0 && (
+                        <Button onClick={handleAddressesOnClick(addresses)}>Addresses</Button>
+                      )}
+                    </Box>
+                  ))}
 
-              <TableCell>{isFinished}</TableCell>
-              <TableCell>{result}</TableCell>
-              <TableCell>
-                <Button onClick={handleActionOnClick}>Action</Button>
-                <Button onClick={handleDetailOnClick}>Detail</Button>
-                <ModalDetail
-                  isModalOpen={isModalOpen}
-                  handleModalClose={handleModalClose}
-                  modalContent={modalContent}
-                />
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+                  <ModalDetail
+                    isModalOpen={isModalOpen}
+                    handleModalClose={handleModalClose}
+                    modalContent={modalContent}
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </>
   )
 }
 export default Votes

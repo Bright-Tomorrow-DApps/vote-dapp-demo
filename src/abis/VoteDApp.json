@@ -221,23 +221,15 @@
   "ast": {
     "absolutePath": "/Users/bob/src/vote-dapp-demo/src/contracts/VoteDApp.sol",
     "exportedSymbols": {
-      "VoteDApp": [
-        196
-      ],
-      "VoteToken": [
-        377
-      ]
+      "VoteDApp": [196],
+      "VoteToken": [377]
     },
     "id": 197,
     "nodeType": "SourceUnit",
     "nodes": [
       {
         "id": 1,
-        "literals": [
-          "solidity",
-          "0.8",
-          ".4"
-        ],
+        "literals": ["solidity", "0.8", ".4"],
         "nodeType": "PragmaDirective",
         "src": "0:22:0"
       },
@@ -260,9 +252,7 @@
         "contractKind": "contract",
         "fullyImplemented": true,
         "id": 196,
-        "linearizedBaseContracts": [
-          196
-        ],
+        "linearizedBaseContracts": [196],
         "name": "VoteDApp",
         "nameLocation": "60:8:0",
         "nodeType": "ContractDefinition",
@@ -980,9 +970,7 @@
               "src": "742:278:0",
               "statements": [
                 {
-                  "assignments": [
-                    71
-                  ],
+                  "assignments": [71],
                   "declarations": [
                     {
                       "constant": false,
@@ -1278,10 +1266,7 @@
                       "isPure": false,
                       "kind": "structConstructorCall",
                       "lValueRequested": false,
-                      "names": [
-                        "proposal",
-                        "addresses"
-                      ],
+                      "names": ["proposal", "addresses"],
                       "nodeType": "FunctionCall",
                       "src": "905:107:0",
                       "tryCall": false,
@@ -2634,23 +2619,15 @@
   "legacyAST": {
     "absolutePath": "/Users/bob/src/vote-dapp-demo/src/contracts/VoteDApp.sol",
     "exportedSymbols": {
-      "VoteDApp": [
-        196
-      ],
-      "VoteToken": [
-        377
-      ]
+      "VoteDApp": [196],
+      "VoteToken": [377]
     },
     "id": 197,
     "nodeType": "SourceUnit",
     "nodes": [
       {
         "id": 1,
-        "literals": [
-          "solidity",
-          "0.8",
-          ".4"
-        ],
+        "literals": ["solidity", "0.8", ".4"],
         "nodeType": "PragmaDirective",
         "src": "0:22:0"
       },
@@ -2673,9 +2650,7 @@
         "contractKind": "contract",
         "fullyImplemented": true,
         "id": 196,
-        "linearizedBaseContracts": [
-          196
-        ],
+        "linearizedBaseContracts": [196],
         "name": "VoteDApp",
         "nameLocation": "60:8:0",
         "nodeType": "ContractDefinition",
@@ -3393,9 +3368,7 @@
               "src": "742:278:0",
               "statements": [
                 {
-                  "assignments": [
-                    71
-                  ],
+                  "assignments": [71],
                   "declarations": [
                     {
                       "constant": false,
@@ -3691,10 +3664,7 @@
                       "isPure": false,
                       "kind": "structConstructorCall",
                       "lValueRequested": false,
-                      "names": [
-                        "proposal",
-                        "addresses"
-                      ],
+                      "names": ["proposal", "addresses"],
                       "nodeType": "FunctionCall",
                       "src": "905:107:0",
                       "tryCall": false,
@@ -5052,8 +5022,8 @@
     "4": {
       "events": {},
       "links": {},
-      "address": "0x3C9407c08d35774ED451121153320eE8EEef5ECE",
-      "transactionHash": "0xe9f38a181ebfbe699c9a76b68d1352bb40d6cc29024af2c9f563b35efce36671"
+      "address": "0xdbabc4508014ed52d509957b449cc22d5e05ebec",
+      "transactionHash": "0x6df939864ece99eb8dc1d0cb6e322a465fe9506418ad174652e5f257c1c134d2"
     }
   },
   "schemaVersion": "3.2.3",

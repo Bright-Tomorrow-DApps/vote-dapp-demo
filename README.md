@@ -18,3 +18,14 @@ classic ETC 61 1 Production
 mordor ETC 63 7 Test
 kotti ETC 6 6 Test
 astor ETC 212 212 Test
+
+```json
+  "networks": {
+    "4": {
+      "events": {},
+      "links": {},
+      "address": "0xdbabc4508014ed52d509957b449cc22d5e05ebec",
+      "transactionHash": "0x6df939864ece99eb8dc1d0cb6e322a465fe9506418ad174652e5f257c1c134d2"
+    }
+  },
+```
